@@ -1,0 +1,80 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: slategrey;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.calculator-container {
+  display: flex;
+  flex-direction: column;
+  background-color: brown;
+  padding: 5px;
+}
+
+.number-display {
+  text-align: end;
+  background-color: black;
+}
+
+.outer-input {
+  min-height: 21px;
+  margin-right: 5px;
+  color: orange;
+}
+
+.inner-input {
+  margin-right: 5px;
+  color: yellowgreen;
+}
+
+.first-row-btns {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+}
+
+.second-and-third-row-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.fourth-and-fifth-row-btns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.equal-button {
+  grid-row: span 2;
+}
+
+.zero-button {
+  grid-column: span 2;
+}
+
+footer {
+  text-align: center;
+  margin-top: 10px;
+}
+
+footer a {
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+}
