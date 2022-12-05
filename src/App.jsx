@@ -1,4 +1,11 @@
 import { useState } from "react";
+import handleDecimal from "./handleFunctions/handleDecimal";
+import {
+  allClear,
+  clearState,
+  clearStateTwo,
+} from "./handleFunctions/clearFunctions";
+import { handleEquals, handleEqualsOP } from "./handleFunctions/handleEquals";
 
 function App() {
   const [innerInput, setInnerInput] = useState("0");
@@ -8,40 +15,16 @@ function App() {
   const [operatorState, setOperatorState] = useState("");
   const [result, setResult] = useState(false);
 
-  const allClear = () => {
-    setInnerInput("0");
-    setOuterInput("0");
-    setFirstNum("");
-    setSecondNum("");
-    setOperatorState("");
-    setResult(false);
-  };
-
-  const clearState = (num) => {
-    setResult(false);
-    setSecondNum(num);
-  };
-
-  const turnIntoNegativeNum = () => {
-    const minusSignRegExp = /[-]/g;
-    let operators = /[-x+/]/g;
-    let minusIndex = outerInput.indexOf("-");
-    let indexBeforeContent = outerInput.slice(minusIndex - 1, minusIndex);
-    let operatorTest = operators.test(indexBeforeContent);
-    let minusTest = minusSignRegExp.test(outerInput);
-
-    if (minusTest && operatorTest) {
-      setSecondNum((prevInput) => "-" + prevInput);
-    }
-  };
-
   const handleClick = (e) => {
     let number = e.target.textContent;
-
-    turnIntoNegativeNum();
+    setInnerInput(number);
 
     if (!operatorState) {
-      setFirstNum((prevInput) => prevInput + number);
+      if (firstNum === "0" && number === "0") {
+        return;
+      } else {
+        setFirstNum((prevInput) => prevInput + number);
+      }
     } else {
       if (secondNum === "0" && number === "0") {
         return;
@@ -53,10 +36,18 @@ function App() {
       }
     }
 
-    if (result) {
-      clearState(number);
+    if (result && !operatorState) {
+      clearStateTwo(
+        number,
+        setResult,
+        setFirstNum,
+        setInnerInput,
+        setOuterInput
+      );
+    } else if (result && operatorState && outerInput.indexOf("=") !== -1) {
+      clearState(number, setResult, setSecondNum);
     }
-    setInnerInput(number);
+
     if (outerInput === "0") {
       setOuterInput(number);
     } else if (secondNum !== "0") {
@@ -66,36 +57,40 @@ function App() {
     }
   };
 
-  const handleDecimal = (e) => {
-    const decimal = e.target.textContent;
-
-    if (!operatorState) {
-      if (/[.]/.test(firstNum)) {
-        return;
-      }
-      setFirstNum((prevInput) => prevInput + decimal);
-      setInnerInput(".");
-      setOuterInput((prevInput) => prevInput + decimal);
-    } else {
-      if (/[.]/.test(secondNum)) {
-        return;
-      } else {
-        setSecondNum((prevInput) => prevInput + decimal);
-        setInnerInput(".");
-        setOuterInput((prevInput) => prevInput + decimal);
-      }
-    }
-  };
-
   const handleOperation = (e) => {
     let operator = e.target.textContent;
     let operators = /[x+/]/g;
 
-    if (result) {
+    const setInOu = () => {
+      setInnerInput(operator);
+      setOuterInput((prevInput) => prevInput + operator);
+    };
+
+    const setInOuFirst = () => {
+      setInnerInput(operator);
+      setOuterInput(operator);
+      setFirstNum(operator);
+    };
+
+    const setInOuSecnd = () => {
+      setInnerInput(operator);
+      setOuterInput((prevInput) => prevInput + operator);
+      setSecondNum((prevInput) => prevInput + operator);
+    };
+
+    if (result && outerInput.indexOf("=") !== -1) {
       setResult(false);
       setOuterInput(firstNum);
     } else if (secondNum) {
-      handleEqualsOp();
+      handleEqualsOP(
+        firstNum,
+        secondNum,
+        operatorState,
+        setResult,
+        setFirstNum,
+        setSecondNum,
+        setOperatorState
+      );
     }
     let beforeMinusIndex = outerInput.indexOf(operator - 1);
 
@@ -103,92 +98,16 @@ function App() {
       operator === "-" &&
       operators.test(outerInput.slice(beforeMinusIndex))
     ) {
-      setInnerInput(operator);
-      setOuterInput((prevInput) => prevInput + operator);
+      setInOuSecnd();
     } else if (operator === "-" && outerInput.slice(beforeMinusIndex) === "-") {
-      setInnerInput(operator);
-      setOuterInput((prevInput) => prevInput + operator);
-      setSecondNum((prevInput) => prevInput + "-");
+      setInOuSecnd();
+    } else if (innerInput === "0" && outerInput === "0" && operator === "-") {
+      setInOuFirst();
+    } else if (innerInput === "0" && outerInput === "0" && operator !== "-") {
+      return;
     } else {
       setOperatorState(operator);
-      setInnerInput(operator);
-      setOuterInput((prevInput) => prevInput + operator);
-    }
-  };
-
-  const toFixedFunction = (num) => {
-    return num % 1 !== 0 ? Number(num).toFixed(2) : num;
-  };
-
-  const add = (a, b) => {
-    let sum = a + b;
-    return toFixedFunction(sum);
-  };
-
-  const subtract = (a, b) => {
-    let difference = a - b;
-    return toFixedFunction(difference);
-  };
-
-  const multiply = (a, b) => {
-    let product = a * b;
-    return toFixedFunction(product);
-  };
-
-  const divide = (a, b) => {
-    let quotient = a / b;
-    return toFixedFunction(quotient);
-  };
-
-  const setStuffOp = (resul) => {
-    setResult(true);
-    setFirstNum(resul);
-    setSecondNum("");
-    setOperatorState("");
-  };
-
-  const setStuffEq = (resul) => {
-    setResult(true);
-    setFirstNum(resul);
-    setSecondNum("");
-    setInnerInput(resul);
-    setOuterInput((prevInput) => prevInput + "=" + resul);
-    setOperatorState("");
-  };
-
-  const handleEquals = () => {
-    if (operatorState === "+") {
-      let sum = add(Number(firstNum), Number(secondNum));
-      setStuffEq(sum);
-    } else if (operatorState === "-") {
-      let difference = subtract(Number(firstNum), Number(secondNum));
-      setStuffEq(difference);
-    } else if (operatorState === "x") {
-      let product = multiply(Number(firstNum), Number(secondNum));
-      setStuffEq(product);
-    } else if (operatorState === "/") {
-      let quotient = divide(Number(firstNum), Number(secondNum));
-      setStuffEq(quotient);
-    } else {
-      return;
-    }
-  };
-
-  const handleEqualsOp = () => {
-    if (operatorState === "+") {
-      let sum = add(Number(firstNum), Number(secondNum));
-      setStuffOp(sum);
-    } else if (operatorState === "-") {
-      let difference = subtract(Number(firstNum), Number(secondNum));
-      setStuffOp(difference);
-    } else if (operatorState === "x") {
-      let product = multiply(Number(firstNum), Number(secondNum));
-      setStuffOp(product);
-    } else if (operatorState === "/") {
-      let quotient = divide(Number(firstNum), Number(secondNum));
-      setStuffOp(quotient);
-    } else {
-      return;
+      setInOu();
     }
   };
 
@@ -203,7 +122,20 @@ function App() {
             <div className="inner-input">{innerInput}</div>
           </div>
           <div className="first-row-btns">
-            <button type="button" onClick={allClear} id="clear">
+            <button
+              type="button"
+              onClick={() =>
+                allClear(
+                  setInnerInput,
+                  setOuterInput,
+                  setFirstNum,
+                  setSecondNum,
+                  setOperatorState,
+                  setResult
+                )
+              }
+              id="clear"
+            >
               AC
             </button>
             <button type="button" onClick={handleOperation} id="divide">
@@ -253,7 +185,19 @@ function App() {
               type="button"
               className="equal-button"
               id="equals"
-              onClick={handleEquals}
+              onClick={() =>
+                handleEquals(
+                  firstNum,
+                  secondNum,
+                  operatorState,
+                  setResult,
+                  setFirstNum,
+                  setSecondNum,
+                  setOperatorState,
+                  setInnerInput,
+                  setOuterInput
+                )
+              }
             >
               =
             </button>
@@ -265,7 +209,24 @@ function App() {
             >
               0
             </button>
-            <button type="button" onClick={handleDecimal} id="decimal">
+            <button
+              type="button"
+              onClick={(e) =>
+                handleDecimal(
+                  e,
+                  setInnerInput,
+                  setOuterInput,
+                  operatorState,
+                  firstNum,
+                  secondNum,
+                  setFirstNum,
+                  setSecondNum,
+                  outerInput,
+                  setResult
+                )
+              }
+              id="decimal"
+            >
               .
             </button>
           </div>
