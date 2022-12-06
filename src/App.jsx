@@ -1,11 +1,11 @@
 import { useState } from "react";
-import handleDecimal from "./handleFunctions/handleDecimal";
-import {
-  allClear,
-  clearState,
-  clearStateTwo,
-} from "./handleFunctions/clearFunctions";
-import { handleEquals, handleEqualsOP } from "./handleFunctions/handleEquals";
+import { clearState, clearStateTwo } from "./handleFunctions/clearFunctions";
+import { handleEqualsOP } from "./handleFunctions/handleEquals";
+import NumberDisplay from "./components/NumberDisplay";
+import FirstRowBtns from "./components/FirstRowBtns";
+import Footer from "./components/Footer";
+import SecondThirdRowBtns from "./components/SecondThirdRowBtns";
+import FourthFifthRowBtns from "./components/FourthFifthRowBtns";
 
 function App() {
   const [innerInput, setInnerInput] = useState("0");
@@ -79,9 +79,11 @@ function App() {
     };
 
     if (result && outerInput.indexOf("=") !== -1) {
+      console.log("1");
       setResult(false);
       setOuterInput(firstNum);
     } else if (secondNum) {
+      console.log("2");
       handleEqualsOP(
         firstNum,
         secondNum,
@@ -98,14 +100,39 @@ function App() {
       operator === "-" &&
       operators.test(outerInput.slice(beforeMinusIndex))
     ) {
+      console.log("3");
       setInOuSecnd();
     } else if (operator === "-" && outerInput.slice(beforeMinusIndex) === "-") {
+      console.log("4");
       setInOuSecnd();
     } else if (innerInput === "0" && outerInput === "0" && operator === "-") {
+      console.log("5");
       setInOuFirst();
     } else if (innerInput === "0" && outerInput === "0" && operator !== "-") {
+      console.log("6");
       return;
+    } else if (operators.test(outerInput.slice(-1))) {
+      console.log("7");
+      setInnerInput(operator);
+      setOuterInput(outerInput.slice(0, -1) + operator);
+      setOperatorState(operator);
+    } else if (
+      outerInput.slice(-1) === "-" &&
+      operator !== "-" &&
+      !operators.test(outerInput.slice(-2))
+    ) {
+      console.log("8");
+      setInnerInput(operator);
+      setOuterInput(outerInput.slice(0, -1) + operator);
+      setOperatorState(operator);
+    } else if (
+      outerInput.slice(-1) === "-" &&
+      operator !== "-" &&
+      operators.test(outerInput.slice(-2))
+    ) {
+      console.log("9");
     } else {
+      console.log("10");
       setOperatorState(operator);
       setInOu();
     }
@@ -115,132 +142,36 @@ function App() {
     <div className="App">
       <div className="main-footer-container">
         <div className="calculator-container">
-          <div className="number-display">
-            <div className="outer-input" id="display">
-              {outerInput}
-            </div>
-            <div className="inner-input">{innerInput}</div>
-          </div>
-          <div className="first-row-btns">
-            <button
-              type="button"
-              onClick={() =>
-                allClear(
-                  setInnerInput,
-                  setOuterInput,
-                  setFirstNum,
-                  setSecondNum,
-                  setOperatorState,
-                  setResult
-                )
-              }
-              id="clear"
-            >
-              AC
-            </button>
-            <button type="button" onClick={handleOperation} id="divide">
-              /
-            </button>
-            <button type="button" onClick={handleOperation} id="multiply">
-              x
-            </button>
-          </div>
-          <div className="second-and-third-row-btns">
-            <button type="button" id="seven" onClick={handleClick}>
-              7
-            </button>
-            <button type="button" id="eight" onClick={handleClick}>
-              8
-            </button>
-            <button type="button" id="nine" onClick={handleClick}>
-              9
-            </button>
-            <button type="button" onClick={handleOperation} id="subtract">
-              -
-            </button>
-            <button type="button" id="four" onClick={handleClick}>
-              4
-            </button>
-            <button type="button" id="five" onClick={handleClick}>
-              5
-            </button>
-            <button type="button" id="six" onClick={handleClick}>
-              6
-            </button>
-            <button type="button" onClick={handleOperation} id="add">
-              +
-            </button>
-          </div>
-          <div className="fourth-and-fifth-row-btns">
-            <button type="button" id="one" onClick={handleClick}>
-              1
-            </button>
-            <button type="button" id="two" onClick={handleClick}>
-              2
-            </button>
-            <button type="button" id="three" onClick={handleClick}>
-              3
-            </button>
-            <button
-              type="button"
-              className="equal-button"
-              id="equals"
-              onClick={() =>
-                handleEquals(
-                  firstNum,
-                  secondNum,
-                  operatorState,
-                  setResult,
-                  setFirstNum,
-                  setSecondNum,
-                  setOperatorState,
-                  setInnerInput,
-                  setOuterInput
-                )
-              }
-            >
-              =
-            </button>
-            <button
-              type="button"
-              className="zero-button"
-              id="zero"
-              onClick={handleClick}
-            >
-              0
-            </button>
-            <button
-              type="button"
-              onClick={(e) =>
-                handleDecimal(
-                  e,
-                  setInnerInput,
-                  setOuterInput,
-                  operatorState,
-                  firstNum,
-                  secondNum,
-                  setFirstNum,
-                  setSecondNum,
-                  outerInput,
-                  setResult
-                )
-              }
-              id="decimal"
-            >
-              .
-            </button>
-          </div>
+          <NumberDisplay outerInput={outerInput} innerInput={innerInput} />
+          <FirstRowBtns
+            props={{
+              setFirstNum,
+              setInnerInput,
+              setOuterInput,
+              setSecondNum,
+              setOperatorState,
+              setResult,
+              handleOperation,
+            }}
+          />
+          <SecondThirdRowBtns props={{ handleClick, handleOperation }} />
+          <FourthFifthRowBtns
+            props={{
+              handleClick,
+              firstNum,
+              secondNum,
+              operatorState,
+              setResult,
+              setFirstNum,
+              setSecondNum,
+              setInnerInput,
+              setOuterInput,
+              setOperatorState,
+              outerInput,
+            }}
+          />
         </div>
-        <footer>
-          Designed and coded by{" "}
-          <a
-            href="https://www.freecodecamp.org/no-stack-dub-sack"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Peter Weinberg
-          </a>
-        </footer>
+        <Footer />
       </div>
     </div>
   );
