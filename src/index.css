@@ -30,6 +30,7 @@ code {
 .number-display {
   text-align: end;
   background-color: black;
+  font-size: 1.5rem;
 }
 
 .outer-input {
@@ -46,16 +47,19 @@ code {
 .first-row-btns {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
+  height: 40px;
 }
 
 .second-and-third-row-btns {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  height: 80px;
 }
 
 .fourth-and-fifth-row-btns {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  height: 80px;
 }
 
 .equal-button {
@@ -77,4 +81,12 @@ footer a {
 
 button {
   cursor: pointer;
+  color: thistle;
+  background-color: slateblue;
+  font-size: 1.2rem;
+}
+
+button:hover {
+  background-color: rgb(175, 124, 28);
+  color: blue;
 }

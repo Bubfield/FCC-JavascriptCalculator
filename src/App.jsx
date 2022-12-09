@@ -26,7 +26,7 @@ function App() {
         setFirstNum((prevInput) => prevInput + number);
       }
     } else {
-      if (secondNum === "0" && number === "0") {
+      if ((secondNum === "0" || secondNum === "-0") && number === "0") {
         return;
       } else if (secondNum === "0" && number !== "0") {
         setInnerInput(number);
@@ -60,6 +60,7 @@ function App() {
   const handleOperation = (e) => {
     let operator = e.target.textContent;
     let operators = /[x+/]/g;
+    let allOperators = /[x+-/]/;
 
     const setInOu = () => {
       setInnerInput(operator);
@@ -82,7 +83,7 @@ function App() {
       console.log("1");
       setResult(false);
       setOuterInput(firstNum);
-    } else if (secondNum) {
+    } else if (secondNum && secondNum !== "-") {
       console.log("2");
       handleEqualsOP(
         firstNum,
@@ -94,23 +95,43 @@ function App() {
         setOperatorState
       );
     }
-    let beforeMinusIndex = outerInput.indexOf(operator - 1);
 
     if (
+      allOperators.test(outerInput.slice(-2, -1)) &&
+      outerInput.slice(-1) === "-" &&
+      operator !== "-"
+    ) {
+      console.log("yo");
+      setInnerInput(operator);
+      setOuterInput((prevInput) => prevInput.slice(0, -2));
+      setOperatorState(operator);
+      setSecondNum("");
+    }
+
+    if (outerInput === "-" && operator === "-") {
+      console.log("20");
+      return;
+    }
+
+    if (outerInput.slice(-2) === "--" && operator === "-") {
+      console.log("30");
+      return;
+    } else if (
       operator === "-" &&
-      operators.test(outerInput.slice(beforeMinusIndex))
+      allOperators.test(outerInput.slice(-1)) &&
+      secondNum !== "-" &&
+      (outerInput !== "+" || outerInput !== "x" || outerInput !== "/")
     ) {
       console.log("3");
-      setInOuSecnd();
-    } else if (operator === "-" && outerInput.slice(beforeMinusIndex) === "-") {
-      console.log("4");
       setInOuSecnd();
     } else if (innerInput === "0" && outerInput === "0" && operator === "-") {
       console.log("5");
       setInOuFirst();
     } else if (innerInput === "0" && outerInput === "0" && operator !== "-") {
       console.log("6");
-      return;
+      setInnerInput(operator);
+      setOuterInput((prevInput) => prevInput + operator);
+      setOperatorState(operator);
     } else if (operators.test(outerInput.slice(-1))) {
       console.log("7");
       setInnerInput(operator);
@@ -119,18 +140,18 @@ function App() {
     } else if (
       outerInput.slice(-1) === "-" &&
       operator !== "-" &&
-      !operators.test(outerInput.slice(-2))
+      !allOperators.test(outerInput.slice(-2))
     ) {
       console.log("8");
       setInnerInput(operator);
       setOuterInput(outerInput.slice(0, -1) + operator);
       setOperatorState(operator);
     } else if (
+      operators.test(outerInput.slice(-2, -1)) &&
       outerInput.slice(-1) === "-" &&
-      operator !== "-" &&
-      operators.test(outerInput.slice(-2))
+      operator === "-"
     ) {
-      console.log("9");
+      return;
     } else {
       console.log("10");
       setOperatorState(operator);
